@@ -1,0 +1,44 @@
+---
+- hosts: database
+  become: true
+  gather_facts: true
+  tasks:
+    - name: install mariadb and pip
+      yum:
+        name:
+          - mariadb-server
+          - pip
+        state: latest
+
+    - name: install pymysql
+      pip:
+        name: pymysql
+
+    - name: start mariadb
+      service:
+        name: mariadb
+        enabled: true
+        state: started
+
+    - name: set root password
+      mysql_user:
+        login_user: root
+        login_password: password
+        name: admin
+        password: password
+        priv: '*.*:ALL,GRANT'
+        state: present
+
+    - name: copy sql file to node
+      copy:
+        src: /home/ec2-user/ansible-Lab1/config.sql
+        dest: /home/admin
+        owner: admin
+
+    - name: create database with the sql file
+      mysql_db:
+        login_user: admin
+        login_password: password
+        name: sample
+        state: import
+        target: /home/admin/config.sql

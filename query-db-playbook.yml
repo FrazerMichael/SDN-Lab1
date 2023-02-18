@@ -1,0 +1,23 @@
+---
+- hosts: database
+  become: true
+  gather_facts: true
+  tasks:
+    - name: copy sql file to node
+      copy:
+        src: /home/ec2-user/ansible-Lab1/query.sql
+        dest: /home/admin
+        owner: admin
+
+    - name: query database
+      mysql_db:
+        login_user: admin
+        login_password: password
+        name: sample
+        state: import
+        target: /home/admin/query.sql
+      register: sql_data
+
+    - name: print
+      ansible.builtin.debug:
+        var: sql_data

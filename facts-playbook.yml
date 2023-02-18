@@ -1,0 +1,17 @@
+---
+- hosts: all
+  gather_facts: true
+  tasks:
+  - debug:
+      var: ansible_hostname
+
+  - name: Get MySQL version with non-default credentials
+    community.mysql.mysql_info:
+      login_user: admin
+      login_password: password
+      filter: version
+    register: sql_data
+
+  - name: print
+    ansible.builtin.debug:
+      var: sql_data

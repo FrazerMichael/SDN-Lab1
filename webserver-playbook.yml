@@ -1,0 +1,32 @@
+---
+- hosts: webservers
+  become: yes
+  vars:
+    inc_destination: /var/www
+    php_destination: /var/www/html
+    inc_dir: /home/ec2-user/ansible-Lab1/inc
+    php_file: /home/ec2-user/ansible-Lab1/SamplePage.php
+  tasks:
+    - name: Update and install httpd
+      yum:
+        name: httpd
+        state: latest
+        update_cache: yes
+
+    - name: Copy SamplePage.php file to webservers
+      copy:
+        src: "{{ php_file }}"
+        dest: "{{ php_destination }}"
+        mode: preserve
+
+    - name: Copy dbinfo.inc file to webservers
+      copy:
+        src: "{{ inc_dir }}"
+        dest: "{{ inc_destination }}"
+        mode: preserve
+
+    - name: Restart and enable httpd
+      service:
+        name: httpd
+        state: restarted
+        enabled: yes
